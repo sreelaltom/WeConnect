@@ -46,3 +46,5 @@ coverage.xml
 # Others
 *.bak
 *.swp
+# Handle line endings automatically for text files
+* text=auto

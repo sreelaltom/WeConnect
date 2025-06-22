@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { likePost, unlikePost } from "../api/post";
-import { getComments, addComment } from "../api/comments"; // Create this if not already
+import { getComments, addComment } from "../api/comments";
+import { Heart, MessageCircle } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function PostCard({ post }) {
+  const { theme } = useTheme(); // get theme
+  const isDarkMode = theme === "light"; // PostCard is opposite to Navbar
+
   const [liked, setLiked] = useState(post.is_liked_by_current_user);
   const [likeCount, setLikeCount] = useState(post.likes_count);
   const [showComments, setShowComments] = useState(false);
@@ -49,33 +54,44 @@ export default function PostCard({ post }) {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-xl p-4 space-y-3 border border-gray-200">
+    <div
+      className={`shadow-md rounded-xl p-4 space-y-3 border transition-colors duration-500 ${
+        isDarkMode
+          ? "bg-gray-900 text-white border-gray-700"
+          : "bg-white text-black border-gray-300"
+      }`}
+    >
       <div className="flex justify-between">
-        <span className="font-semibold text-gray-700">
-          @{post.owner_username}
-        </span>
-        <span className="text-sm text-gray-500">
+        <span className="font-semibold">@{post.owner_username}</span>
+        <span className="text-sm">
           {new Date(post.timestamp).toLocaleString()}
         </span>
       </div>
 
-      <h2 className="text-lg font-bold text-gray-900">{post.title}</h2>
-      <p className="text-gray-800">{post.content}</p>
+      <h2 className="text-lg font-bold">{post.title}</h2>
+      <p>{post.content}</p>
 
-      <div className="flex justify-between items-center mt-4">
+      <div className="flex justify-between items-center mt-4 space-x-2">
         <button
           onClick={toggleLike}
-          className={`px-4 py-1 rounded-full text-sm font-medium ${
-            liked ? "bg-red-400 text-white" : "bg-gray-200 text-gray-700"
+          className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium transition transform ${
+            liked
+              ? "bg-red-500 text-white scale-105"
+              : isDarkMode
+              ? "bg-gray-200 text-black hover:bg-red-400 hover:text-white"
+              : "bg-gray-700 text-white hover:bg-red-400 hover:text-white"
           }`}
         >
-          {liked ? "Liked" : "Like"} ({likeCount})
+          <Heart size={16} fill={liked ? "white" : "none"} />
+          <span>{likeCount}</span>
         </button>
+
         <button
           onClick={toggleComments}
-          className="px-4 py-1 bg-blue-500 text-white rounded-full text-sm hover:bg-blue-600 transition"
+          className="flex items-center space-x-1 px-3 py-1 bg-blue-500 text-white rounded-full text-sm hover:bg-blue-600 transition transform hover:scale-105"
         >
-          {showComments ? "Hide Comments" : "Comments"}
+          <MessageCircle size={16} />
+          <span>{showComments ? "Hide" : "Comments"}</span>
         </button>
       </div>
 
@@ -83,15 +99,22 @@ export default function PostCard({ post }) {
         <div className="mt-4 space-y-2">
           {comments.length > 0 ? (
             comments.map((comment) => (
-              <div key={comment.id} className="border p-2 rounded bg-gray-50">
-                <span className="font-semibold text-gray-700">
+              <div
+                key={comment.id}
+                className={`border p-2 rounded ${
+                  isDarkMode
+                    ? "bg-gray-800 text-white border-gray-700"
+                    : "bg-gray-100 text-black border-gray-300"
+                }`}
+              >
+                <span className="font-semibold">
                   @{comment.owner_username}:
                 </span>{" "}
                 {comment.content}
               </div>
             ))
           ) : (
-            <p className="text-gray-500 text-sm">No comments yet.</p>
+            <p className="text-sm">No comments yet.</p>
           )}
 
           <div className="flex space-x-2 mt-2">
@@ -100,7 +123,11 @@ export default function PostCard({ post }) {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="flex-1 border rounded px-3 py-1 text-sm"
+              className={`flex-1 border rounded px-3 py-1 text-sm transition ${
+                isDarkMode
+                  ? "bg-gray-800 text-white border-gray-700"
+                  : "bg-gray-100 text-black border-gray-300"
+              }`}
             />
             <button
               onClick={handleAddComment}
