@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { getPostsWithCounts } from "../api/post";
 import PostCard from "../components/PostCard";
+import { useTheme } from "../context/ThemeContext"; // 👈 Using global theme
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
-  const [theme, setTheme] = useState(localStorage.theme || "light");
+  const { theme } = useTheme(); // 👈 Getting global theme
+
+  const isOppositeDarkMode = theme === "light"; // 👈 Opposite of global
 
   useEffect(() => {
     async function fetchPosts() {
@@ -18,44 +21,17 @@ export default function Home() {
     fetchPosts();
   }, []);
 
-  // Apply theme when changed
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-      localStorage.theme = "dark";
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.theme = "light";
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-r from-gray-100 to-gray-300 dark:from-gray-900 dark:to-gray-800 p-6 transition-colors duration-300">
-      {/* Theme Toggle Button */}
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={toggleTheme}
-          className="bg-[#b78654] text-white px-4 py-2 rounded-full shadow hover:bg-[#9c653a] transition duration-300 flex items-center space-x-2"
-        >
-          {theme === "dark" ? (
-            <>
-              <span>☀️</span> <span className="hidden sm:inline">Light</span>
-            </>
-          ) : (
-            <>
-              <span>🌙</span> <span className="hidden sm:inline">Dark</span>
-            </>
-          )}
-        </button>
-      </div>
-
+    <div
+      className={`min-h-screen p-6 transition-colors duration-500 ${
+        isOppositeDarkMode
+          ? "bg-gradient-to-r from-gray-900 to-gray-800 text-white"
+          : "bg-gradient-to-r from-gray-100 to-gray-300 text-gray-900"
+      }`}
+    >
       <h1
         className={`text-3xl font-bold text-center mb-8 ${
-          theme === "dark" ? "text-blue-300" : "text-[#b78654]"
+          isOppositeDarkMode ? "text-blue-300" : "text-[#b78654]"
         }`}
       >
         Latest Posts 🚀
@@ -65,7 +41,11 @@ export default function Home() {
         {posts.length > 0 ? (
           posts.map((post) => <PostCard key={post.id} post={post} />)
         ) : (
-          <p className="text-center text-gray-600 dark:text-gray-300 col-span-full">
+          <p
+            className={`col-span-full text-center ${
+              isOppositeDarkMode ? "text-gray-300" : "text-gray-600"
+            }`}
+          >
             No posts yet.
           </p>
         )}

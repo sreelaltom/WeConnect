@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { createPost } from "../api/post";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext"; // Importing theme context
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const navigate = useNavigate();
+  const { theme } = useTheme(); // Getting global theme
+  const isOppositeDarkMode = theme === "light"; // Flip the theme
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,12 +21,26 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-100 to-pink-200 flex items-center justify-center pt-20">
+    <div
+      className={`min-h-screen pt-24 flex items-center justify-center transition-colors duration-500 ${
+        isOppositeDarkMode
+          ? "bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white"
+          : "bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 text-gray-900"
+      }`}
+    >
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-md w-96 space-y-4"
+        className={`p-8 rounded-3xl shadow-xl w-96 space-y-4 transition-all duration-500 border backdrop-blur-md ${
+          isOppositeDarkMode
+            ? "bg-gray-900/70 border-gray-700"
+            : "bg-white/30 border-white/40"
+        }`}
       >
-        <h2 className="text-xl font-bold text-center text-[#b78654] dark:text-blue-300">
+        <h2
+          className={`text-2xl font-bold text-center ${
+            isOppositeDarkMode ? "text-blue-300" : "text-[#b78654]"
+          }`}
+        >
           Create New Post
         </h2>
         <input
@@ -31,20 +48,28 @@ export default function CreatePostPage() {
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 border rounded"
           required
+          className={`w-full p-2 rounded focus:outline-none backdrop-blur-md ${
+            isOppositeDarkMode
+              ? "bg-gray-700 text-white border-gray-600"
+              : "bg-white/70 text-gray-800 border-white/40"
+          }`}
         />
         <textarea
           placeholder="Content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="w-full p-2 border rounded"
           rows="4"
           required
+          className={`w-full p-2 rounded focus:outline-none backdrop-blur-md ${
+            isOppositeDarkMode
+              ? "bg-gray-700 text-white border-gray-600"
+              : "bg-white/70 text-gray-800 border-white/40"
+          }`}
         />
         <button
           type="submit"
-          className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition"
+          className="w-full bg-green-500 text-white py-2 rounded-full shadow-md hover:bg-green-600 transition duration-300"
         >
           Post
         </button>

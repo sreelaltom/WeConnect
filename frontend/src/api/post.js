@@ -77,3 +77,13 @@ export const createPost = async (postData) => {
   });
   return res.data;
 };
+// Get posts by a specific user (for profile page)
+export const getPostsByUser = async (userId) => {
+  const token = localStorage.getItem("token");
+  const response = await api.get(`/posts/user/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};

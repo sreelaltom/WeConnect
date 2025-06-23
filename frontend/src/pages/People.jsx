@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Import this
 import { getAllUsers, followUser, unfollowUser } from "../api/people";
 import { useTheme } from "../context/ThemeContext";
 
@@ -6,9 +7,10 @@ export default function PeoplePage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const { theme } = useTheme();
+  const navigate = useNavigate(); // ✅ Add this
 
   const isNavbarDark = theme === "dark";
-  const isCardDark = !isNavbarDark; // Opposite of Navbar
+  const isCardDark = !isNavbarDark;
 
   useEffect(() => {
     fetchUsers();
@@ -50,7 +52,8 @@ export default function PeoplePage() {
           users.map((user) => (
             <div
               key={user.id}
-              className={`relative flex flex-col items-center rounded-2xl p-6 shadow-xl border transition-transform transform hover:scale-105 duration-300
+              onClick={() => navigate(`/profile/${user.id}`)} // ✅ Navigate on click
+              className={`cursor-pointer relative flex flex-col items-center rounded-2xl p-6 shadow-xl border transition-transform transform hover:scale-105 duration-300
               ${
                 isCardDark
                   ? "bg-gray-900 text-white border-gray-700"
@@ -83,7 +86,10 @@ export default function PeoplePage() {
               </p>
 
               <button
-                onClick={() => handleFollowToggle(user.id, user.is_following)}
+                onClick={(e) => {
+                  e.stopPropagation(); // ✅ Prevent card click
+                  handleFollowToggle(user.id, user.is_following);
+                }}
                 className={`mt-6 px-5 py-2 rounded-full text-sm font-medium shadow-lg transition-all duration-300
                   ${
                     user.is_following
@@ -94,7 +100,6 @@ export default function PeoplePage() {
                 {user.is_following ? "Unfollow" : "Follow"}
               </button>
 
-              {/* Ribbon for followed users */}
               {user.is_following && (
                 <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
                   Following

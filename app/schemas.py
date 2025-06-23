@@ -37,6 +37,8 @@ class UserWithFollowers(BaseModel):
         from_attributes = True
 
 
+
+
 # ------------------------ Token Schemas ------------------------
 
 class Token(BaseModel):
@@ -118,3 +120,13 @@ class Comment(CommentBase):
     class Config:
         from_attributes = True  # ✅ Important for .from_orm() to work
 
+class UserProfileWithPosts(BaseModel):
+    id: int
+    username: str
+    followers_count: int
+    following_count: int
+    is_following: bool
+    posts: List[Post]  # assuming your Post schema exists
+
+    class Config:
+        orm_mode = True

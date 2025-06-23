@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // ✅ import Link
 import { FaHeart, FaRegHeart, FaComment } from "react-icons/fa";
 import { likePost, unlikePost } from "../api/post";
 import { getComments, addComment } from "../api/comments";
@@ -68,15 +69,18 @@ const PostCard = ({ post }) => {
       <p className="text-gray-600 dark:text-gray-300 mb-2">{post.content}</p>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
         Posted by{" "}
-        <strong className="text-[#b78654] dark:text-gray-200">
-          {post.owner_username}
-        </strong>
+        <Link
+          to={`/profile/${post.owner_id}`} // 👈 Make sure `post.owner_id` exists in your post object
+          className="text-[#b78654] dark:text-purple-300 hover:underline"
+        >
+          @{post.owner_username}
+        </Link>
       </p>
 
       <div className="flex items-center space-x-4">
         <button
           onClick={handleLikeToggle}
-          className="flex items-center space-x-1 text-red-500"
+          className="flex items-center space-x-1 text-green-500 hover:bg-green-600 hover:text-white px-3 py-1 rounded transition"
         >
           {isLiked ? <FaHeart /> : <FaRegHeart />}
           <span>{likesCount}</span>
@@ -84,7 +88,7 @@ const PostCard = ({ post }) => {
 
         <button
           onClick={toggleComments}
-          className="flex items-center space-x-1 text-blue-500"
+          className="flex items-center space-x-1 text-blue-500 hover:bg-blue-600 hover:text-white px-3 py-1 rounded transition"
         >
           <FaComment />
           <span>{commentsCount}</span>
@@ -105,7 +109,6 @@ const PostCard = ({ post }) => {
             ))
           )}
 
-          {/* Add Comment Box */}
           <form onSubmit={handleAddComment} className="mt-4 flex space-x-2">
             <input
               type="text"

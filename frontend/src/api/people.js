@@ -22,3 +22,10 @@ export const unfollowUser = async (userId) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+export const getUserProfile = async (userId) => {
+  const token = localStorage.getItem("token");
+  const res = await api.get(`/users/${userId}/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};

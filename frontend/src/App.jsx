@@ -3,9 +3,10 @@ import AuthPage from "./pages/AuthPage";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import People from "./pages/People";
-import CreatePostPage from "./pages/CreatePostPage"; // ✅ Import CreatePostPage
+import CreatePostPage from "./pages/CreatePostPage";
+import UserProfilePage from "./pages/UserProfilePage"; // ✅ Import dynamic user profile page
 import { PrivateRoute } from "./components/PrivateRoute";
-import Layout from "./components/Layout"; // ✅ Import Layout
+import Layout from "./components/Layout";
 
 function App() {
   return (
@@ -36,6 +37,16 @@ function App() {
           }
         />
         <Route
+          path="/profile/:userId" // ✅ NEW: Dynamic route for other user's profile
+          element={
+            <PrivateRoute>
+              <Layout>
+                <UserProfilePage />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/people"
           element={
             <PrivateRoute>
@@ -46,7 +57,7 @@ function App() {
           }
         />
         <Route
-          path="/create-post" // ✅ Route for Create Post Page
+          path="/create-post"
           element={
             <PrivateRoute>
               <Layout>

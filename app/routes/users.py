@@ -120,3 +120,31 @@ def delete_my_account(
     
     db.delete(user)
     db.commit()
+@router.get("/{user_id}/profile", response_model=schemas.UserProfileWithPosts)
+def get_user_profile_with_posts(
+    user_id: int,
+    db: db_dependency,
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise_not_found_exception("User not found")
+
+    # Check if the current user is following this user
+    is_following = current_user in user.followers
+
+    posts = (
+        db.query(models.Post)
+        .filter(models.Post.owner_id == user.id)
+        .order_by(models.Post.timestamp.desc())
+        .all()
+    )
+
+    return schemas.UserProfileWithPosts(
+        id=user.id,
+        username=user.username,
+        followers_count=len(user.followers),
+        following_count=len(user.following),
+        is_following=is_following,
+        posts=posts
+    )

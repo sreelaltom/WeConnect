@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, select
 from typing import List, Annotated
 from datetime import timedelta, datetime, timezone
 from sqlalchemy.sql import func, exists
@@ -179,3 +179,66 @@ def read_posts_with_counts(
         )
     return response_posts
 
+@router.get("/user/{user_id}", response_model=List[schemas.PostWithCounts])
+def read_posts_of_user(
+    user_id: int,
+    db: db_dependency,
+    current_user: models.User = Depends(auth.get_current_user),
+):
+    likes_subq = (
+        db.query(
+            models.Like.post_id,
+            func.count(models.Like.user_id).label("likes_count")
+        )
+        .group_by(models.Like.post_id)
+        .subquery()
+    )
+
+    comments_subq = (
+        db.query(
+            models.Comment.post_id,
+            func.count(models.Comment.id).label("comments_count")
+        )
+        .group_by(models.Comment.post_id)
+        .subquery()
+    )
+
+    is_liked_subq = (
+        select(models.Like)
+        .where(models.Like.post_id == models.Post.id)
+        .where(models.Like.user_id == current_user.id)
+        .exists()
+    )
+
+    posts = (
+        db.query(
+            models.Post,
+            models.User.username.label("owner_username"),
+            func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
+            func.coalesce(comments_subq.c.comments_count, 0).label("comments_count"),
+            is_liked_subq.label("is_liked_by_current_user")
+        )
+        .join(models.User, models.Post.owner_id == models.User.id)
+        .outerjoin(likes_subq, models.Post.id == likes_subq.c.post_id)
+        .outerjoin(comments_subq, models.Post.id == comments_subq.c.post_id)
+        .filter(models.Post.owner_id == user_id)  # ✅ Filter by the given user_id
+        .order_by(models.Post.timestamp.desc())
+        .all()
+    )
+
+    response_posts = []
+    for post, owner_username, likes_count, comments_count, is_liked in posts:
+        response_posts.append(
+            schemas.PostWithCounts(
+                id=post.id,
+                title=post.title,
+                content=post.content,
+                timestamp=post.timestamp,
+                owner_id=post.owner_id,
+                owner_username=owner_username,
+                likes_count=likes_count,
+                comments_count=comments_count,
+                is_liked_by_current_user=is_liked,
+            )
+        )
+    return response_posts
