@@ -45,3 +45,6 @@ source venv/bin/activate  # For Windows: venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
+
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
