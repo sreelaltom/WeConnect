@@ -53,7 +53,11 @@ export default function Home() {
         </button>
       </div>
 
-      <h1 className="text-3xl font-bold text-center mb-8 text-blue-700 dark:text-blue-300">
+      <h1
+        className={`text-3xl font-bold text-center mb-8 ${
+          theme === "dark" ? "text-blue-300" : "text-[#b78654]"
+        }`}
+      >
         Latest Posts 🚀
       </h1>
 
@@ -69,4 +73,3 @@ export default function Home() {
     </div>
   );
 }
-//     </button>

@@ -23,7 +23,7 @@ export default function CreatePostPage() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-96 space-y-4"
       >
-        <h2 className="text-xl font-bold text-center text-blue-600">
+        <h2 className="text-xl font-bold text-center text-[#b78654] dark:text-blue-300">
           Create New Post
         </h2>
         <input

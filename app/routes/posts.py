@@ -115,6 +115,7 @@ def read_my_posts(
 
 
 
+# -------------------- GET Posts With Counts -------------------- 
 @router.get("/with_counts/", response_model=List[schemas.PostWithCounts])
 def read_posts_with_counts(
     db: db_dependency,
@@ -125,9 +126,19 @@ def read_posts_with_counts(
     likes_subq = (
         db.query(
             models.Like.post_id,
-            func.count(models.Like.user_id).label("likes_count"),
+            func.count(models.Like.user_id).label("likes_count")
         )
         .group_by(models.Like.post_id)
+        .subquery()
+    )
+
+    # ✅ Comment count subquery added here:
+    comments_subq = (
+        db.query(
+            models.Comment.post_id,
+            func.count(models.Comment.id).label("comments_count")
+        )
+        .group_by(models.Comment.post_id)
         .subquery()
     )
 
@@ -136,14 +147,15 @@ def read_posts_with_counts(
             models.Post,
             models.User.username.label("owner_username"),
             func.coalesce(likes_subq.c.likes_count, 0).label("likes_count"),
-            # Check if current user liked the post
-            db.query(exists().where(
+            func.coalesce(comments_subq.c.comments_count, 0).label("comments_count"),  # ✅ added
+            exists().where(
                 models.Like.post_id == models.Post.id,
                 models.Like.user_id == current_user.id
-            )).label("is_liked_by_current_user")
+            ).label("is_liked_by_current_user")
         )
         .join(models.User, models.Post.owner_id == models.User.id)
         .outerjoin(likes_subq, models.Post.id == likes_subq.c.post_id)
+        .outerjoin(comments_subq, models.Post.id == comments_subq.c.post_id)  # ✅ added
         .order_by(models.Post.timestamp.desc())
         .offset(skip)
         .limit(limit)
@@ -151,7 +163,7 @@ def read_posts_with_counts(
     )
 
     response_posts = []
-    for post, owner_username, likes_count, is_liked in posts:
+    for post, owner_username, likes_count, comments_count, is_liked in posts:
         response_posts.append(
             schemas.PostWithCounts(
                 id=post.id,
@@ -161,8 +173,9 @@ def read_posts_with_counts(
                 owner_id=post.owner_id,
                 owner_username=owner_username,
                 likes_count=likes_count,
-                is_liked_by_current_user=is_liked,  # 👈 new field
+                comments_count=comments_count,  # ✅ return this in schema
+                is_liked_by_current_user=is_liked,
             )
         )
-
     return response_posts
+

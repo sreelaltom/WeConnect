@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../context/ThemeContext"; // ✅ Import theme context
+import { useTheme } from "../context/ThemeContext";
 import {
   getMyProfile,
   getMyPosts,
@@ -13,12 +13,18 @@ export default function ProfilePage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { theme } = useTheme(); // ✅ Global theme
-  const isNavbarDark = theme === "dark"; // ✅ Navbar theme
-  const isDarkMode = !isNavbarDark; // ✅ ProfileCard opposite to Navbar
+  const { theme } = useTheme();
+  const isNavbarDark = theme === "dark";
+  const isDarkMode = !isNavbarDark;
 
   useEffect(() => {
     async function fetchData() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("No token found. Redirecting to login.");
+        navigate("/login");
+        return;
+      }
       try {
         const profileData = await getMyProfile();
         const postData = await getMyPosts();
@@ -31,7 +37,7 @@ export default function ProfilePage() {
       }
     }
     fetchData();
-  }, []);
+  }, [navigate]);
 
   const handleDeletePost = async (postId) => {
     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -65,19 +71,28 @@ export default function ProfilePage() {
     navigate("/");
   };
 
-  if (loading)
+  if (loading) {
     return (
       <p className="text-center mt-10 text-xl font-semibold text-gray-700">
         Loading Profile...
       </p>
     );
+  }
+
+  if (!profile) {
+    return (
+      <p className="text-center mt-10 text-xl font-semibold text-red-600">
+        Failed to load profile. Please try again.
+      </p>
+    );
+  }
 
   return (
     <div
       className={`min-h-screen p-6 pt-24 transition-colors duration-500 ${
         isDarkMode
           ? "bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white"
-          : "bg-gradient-to-br from-pink-100 via-purple-200 to-indigo-300 text-gray-800"
+          : "bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 text-gray-800"
       }`}
     >
       <div
@@ -91,7 +106,7 @@ export default function ProfilePage() {
         <div className="flex flex-col items-center space-y-3">
           <h2
             className={`text-4xl font-extrabold drop-shadow-md ${
-              isDarkMode ? "text-white" : "text-purple-700"
+              isDarkMode ? "text-white" : "text-[#b78654]"
             }`}
           >
             @{profile.username}
@@ -100,7 +115,7 @@ export default function ProfilePage() {
             <div>
               <p
                 className={`text-2xl font-bold ${
-                  isDarkMode ? "text-white" : "text-purple-700"
+                  isDarkMode ? "text-white" : "text-[#b78654]"
                 }`}
               >
                 {profile.followers_count}
@@ -116,7 +131,7 @@ export default function ProfilePage() {
             <div>
               <p
                 className={`text-2xl font-bold ${
-                  isDarkMode ? "text-white" : "text-purple-700"
+                  isDarkMode ? "text-white" : "text-[#b78654]"
                 }`}
               >
                 {profile.following_count}
@@ -138,7 +153,7 @@ export default function ProfilePage() {
             className={`text-2xl font-semibold text-center border-b pb-2 ${
               isDarkMode
                 ? "text-white border-gray-600"
-                : "text-purple-700 border-purple-300"
+                : "text-[#b78654] border-[#b78654]"
             }`}
           >
             My Posts 📝
@@ -157,7 +172,7 @@ export default function ProfilePage() {
                 >
                   <h4
                     className={`text-lg font-semibold ${
-                      isDarkMode ? "text-purple-300" : "text-purple-800"
+                      isDarkMode ? "text-purple-300" : "text-[#b78654]"
                     }`}
                   >
                     {post.title}

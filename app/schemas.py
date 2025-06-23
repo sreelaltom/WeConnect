@@ -71,6 +71,7 @@ class Post(PostBase):
 class PostWithCounts(Post):
     owner_username: str
     likes_count: int
+    comments_count: int 
     retweets_count: int = 0  # default 0 if not using retweets
     is_liked_by_current_user: bool  # ✅ For frontend like button
 

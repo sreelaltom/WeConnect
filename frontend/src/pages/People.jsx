@@ -57,12 +57,28 @@ export default function PeoplePage() {
                   : "bg-white text-gray-800 border-gray-300"
               }`}
             >
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-lg">
+              <div
+                className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold shadow-lg ${
+                  isCardDark
+                    ? "bg-gradient-to-r from-purple-400 to-pink-500 text-white"
+                    : "bg-[#b78654]/90 text-white"
+                }`}
+              >
                 {user.username.charAt(0).toUpperCase()}
               </div>
 
-              <h3 className="mt-4 text-2xl font-semibold">@{user.username}</h3>
-              <p className="text-sm mt-1 text-gray-600 dark:text-gray-500">
+              <h3
+                className={`mt-4 text-2xl font-semibold ${
+                  isCardDark ? "text-white" : "text-[#b78654]"
+                }`}
+              >
+                @{user.username}
+              </h3>
+              <p
+                className={`text-sm mt-1 ${
+                  isCardDark ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
                 {user.followers_count} Followers
               </p>
 
@@ -78,7 +94,7 @@ export default function PeoplePage() {
                 {user.is_following ? "Unfollow" : "Follow"}
               </button>
 
-              {/* Cool ribbon for followed users */}
+              {/* Ribbon for followed users */}
               {user.is_following && (
                 <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
                   Following
