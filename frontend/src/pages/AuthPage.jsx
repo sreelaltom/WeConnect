@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { login, registerUser } from "../api/auth";
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
-import logo from "../assets/logo.jpg"; // ✅ Your logo here
+import logo from "../assets/logo.jpg";
+import { useTheme } from "../context/ThemeContext";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,6 +14,8 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isOppositeDark = theme === "light"; // flip theme feel
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,88 +35,121 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8F9FA] px-4">
-      {/* App Logo with animation */}
+    <div
+      className={`min-h-screen flex flex-col items-center justify-center px-4 transition-all duration-500 ${
+        isOppositeDark
+          ? "bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white"
+          : "bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 text-gray-900"
+      }`}
+    >
+      {/* Logo */}
       <motion.img
         src={logo}
-        alt="WeConnect Logo"
+        alt="Logo"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="w-24 h-24 mb-4 rounded-full shadow-md"
+        className="w-24 h-24 mb-4 rounded-full shadow-lg border-4 border-white"
       />
 
       {/* App Name */}
       <motion.h1
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-bold text-gray-700 mb-6"
+        className={`text-4xl font-bold mb-6 ${
+          isOppositeDark ? "text-green-300" : "text-green-700"
+        }`}
       >
         WeConnect
       </motion.h1>
 
+      {/* Form */}
       <motion.form
         onSubmit={handleSubmit}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ type: "spring", stiffness: 120 }}
-        className="bg-[#F8F9F9] border border-[#DAD7CD] rounded-xl shadow-md p-8 w-full max-w-sm space-y-5"
+        className={`w-full max-w-sm p-8 rounded-3xl shadow-xl border backdrop-blur-md space-y-5 ${
+          isOppositeDark
+            ? "bg-gray-900/70 border-gray-700"
+            : "bg-white/30 border-white/40"
+        }`}
       >
-        <h2 className="text-2xl text-center text-gray-700 font-semibold">
+        <h2
+          className={`text-2xl text-center font-semibold ${
+            isOppositeDark ? "text-white" : "text-green-700"
+          }`}
+        >
           {isLogin ? "Welcome Back 👋" : "Join Us 🎉"}
         </h2>
 
-        {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+        {error && <p className="text-center text-sm text-red-400">{error}</p>}
 
+        {/* Username */}
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full px-4 py-2 rounded-md bg-[#FFFFFF] border border-[#DAD7CD] text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-[#2E86AB]"
+          className={`w-full px-4 py-2 rounded-md outline-none focus:ring-2 ${
+            isOppositeDark
+              ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-green-400"
+              : "bg-white/70 border-white/40 text-gray-800 placeholder-gray-600 focus:ring-green-700"
+          }`}
           required
         />
 
+        {/* Email (only for register) */}
         {!isLogin && (
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 rounded-md bg-[#FFFFFF] border border-[#DAD7CD] text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-[#2E86AB]"
+            className={`w-full px-4 py-2 rounded-md outline-none focus:ring-2 ${
+              isOppositeDark
+                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-green-400"
+                : "bg-white/70 border-white/40 text-gray-800 placeholder-gray-600 focus:ring-green-700"
+            }`}
             required
           />
         )}
 
+        {/* Password */}
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 rounded-md bg-[#FFFFFF] border border-[#DAD7CD] text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-[#2E86AB] pr-10"
+            className={`w-full px-4 py-2 pr-10 rounded-md outline-none focus:ring-2 ${
+              isOppositeDark
+                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:ring-green-400"
+                : "bg-white/70 border-white/40 text-gray-800 placeholder-gray-600 focus:ring-green-700"
+            }`}
             required
           />
           <div
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
             onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </div>
         </div>
 
+        {/* Green Button */}
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           type="submit"
-          className="w-full bg-[#2E86AB] text-white font-semibold py-2 rounded-md hover:bg-[#257495] transition"
+          className="w-full py-2 rounded-md font-semibold shadow transition bg-green-500 hover:bg-green-600 text-white"
         >
           {isLogin ? "Login" : "Register"}
         </motion.button>
 
         <p
           onClick={() => setIsLogin(!isLogin)}
-          className="text-center text-sm text-gray-600 cursor-pointer hover:underline"
+          className="text-center text-sm text-gray-500 cursor-pointer hover:underline"
         >
           {isLogin
             ? "Don't have an account? Register here!"

@@ -130,3 +130,26 @@ class UserProfileWithPosts(BaseModel):
 
     class Config:
         orm_mode = True
+
+class MyPost(BaseModel):
+    id: int
+    title: str
+    content: str
+    timestamp: datetime
+    likes_count: int
+    comments_count: int
+    is_liked_by_current_user: bool
+
+    class Config:
+        from_attributes = True
+
+
+class MyProfileWithPosts(BaseModel):
+    id: int
+    username: str
+    followers_count: int
+    following_count: int
+    posts: List[MyPost]
+
+    class Config:
+        orm_mode = True

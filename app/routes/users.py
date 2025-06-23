@@ -99,16 +99,45 @@ def unfollow_user(
     current_user.following.remove(user_to_unfollow)
     db.commit()
 
-@router.get("/me", response_model=schemas.UserProfile)
+
+@router.get("/me", response_model=schemas.MyProfileWithPosts)
 def read_users_me(
-    current_user: models.User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
 ):
-    return {
-        "id": current_user.id,
-        "username": current_user.username,
-        "followers_count": len(current_user.followers),
-        "following_count": len(current_user.following),
-    }
+    posts = (
+        db.query(models.Post)
+        .filter(models.Post.owner_id == current_user.id)
+        .order_by(models.Post.timestamp.desc())
+        .all()
+    )
+
+    enriched_posts = []
+    for post in posts:
+        likes_count = len(post.likes)
+        comments_count = len(post.comments)
+        is_liked_by_current_user = current_user in [like.user for like in post.likes]
+        
+        enriched_posts.append(
+            schemas.MyPost(
+                id=post.id,
+                title=post.title,
+                content=post.content,
+                timestamp=post.timestamp,
+                likes_count=likes_count,
+                comments_count=comments_count,
+                is_liked_by_current_user=is_liked_by_current_user
+            )
+        )
+
+    return schemas.MyProfileWithPosts(
+        id=current_user.id,
+        username=current_user.username,
+        followers_count=len(current_user.followers),
+        following_count=len(current_user.following),
+        posts=enriched_posts
+    )
+
 @router.delete("/me", status_code=204)
 def delete_my_account(
     db: Session = Depends(get_db),
@@ -120,6 +149,9 @@ def delete_my_account(
     
     db.delete(user)
     db.commit()
+
+
+
 @router.get("/{user_id}/profile", response_model=schemas.UserProfileWithPosts)
 def get_user_profile_with_posts(
     user_id: int,
