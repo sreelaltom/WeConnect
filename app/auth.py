@@ -8,12 +8,17 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from . import models, database, schemas
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # ✅ Load environment variables
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")  # fallback just in case
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
