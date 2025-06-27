@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Axios instance (with token if needed)
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000", // Adjust to your FastAPI server URL
+  baseURL: "https://weconnect-juh3.onrender.com", // Adjust to your FastAPI server URL
 });
 
 // Fetch posts with like/comment counts

@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Axios instance with base URL
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000", // Change if backend URL changes
+  baseURL: "https://weconnect-juh3.onrender.com", // Change if backend URL changes
 });
 
 // ---------------- LOGIN ----------------
