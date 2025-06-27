@@ -15,10 +15,12 @@ export default function AuthPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { theme } = useTheme();
-  const isOppositeDark = theme === "light"; // flip theme feel
+  const isOppositeDark = theme === "light";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
     try {
       if (isLogin) {
         const token = await login(username, password);
@@ -26,11 +28,21 @@ export default function AuthPage() {
         navigate("/home");
       } else {
         await registerUser(username, email, password);
-        setIsLogin(true);
+        setIsLogin(true); // switch to login after register
       }
     } catch (err) {
       console.error(err);
-      setError("Something went wrong!");
+
+      if (isLogin && err?.response?.status === 401) {
+        setError(
+          "User not found or wrong password. Redirecting to Register..."
+        );
+        setTimeout(() => setIsLogin(false), 2000); // auto switch to register after 2s
+      } else if (!isLogin && err?.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError("Something went wrong!");
+      }
     }
   };
 
@@ -137,7 +149,7 @@ export default function AuthPage() {
           </div>
         </div>
 
-        {/* Green Button */}
+        {/* Submit Button */}
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
