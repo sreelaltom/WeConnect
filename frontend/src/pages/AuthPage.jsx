@@ -28,20 +28,27 @@ export default function AuthPage() {
         navigate("/home");
       } else {
         await registerUser(username, email, password);
-        setIsLogin(true); // switch to login after register
+        setIsLogin(true); // switch to login after successful registration
       }
     } catch (err) {
-      console.error(err);
+      console.error("Login/Register Error:", err);
+      const status = err?.response?.status;
+      const detail = err?.response?.data?.detail;
 
-      if (isLogin && err?.response?.status === 401) {
+      if (isLogin && (status === 401 || detail?.includes("not found"))) {
         setError(
           "User not found or wrong password. Redirecting to Register..."
         );
-        setTimeout(() => setIsLogin(false), 2000); // auto switch to register after 2s
-      } else if (!isLogin && err?.response?.data?.detail) {
-        setError(err.response.data.detail);
+        setTimeout(() => {
+          setIsLogin(false); // switch to register form
+          setError(""); // clear the error
+          setEmail(""); // optional: clear fields
+          setPassword("");
+        }, 2000);
+      } else if (!isLogin && detail) {
+        setError(detail);
       } else {
-        setError("Something went wrong!");
+        setError("Something went wrong! Try again.");
       }
     }
   };
@@ -54,7 +61,6 @@ export default function AuthPage() {
           : "bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 text-gray-900"
       }`}
     >
-      {/* Logo */}
       <motion.img
         src={logo}
         alt="Logo"
@@ -64,7 +70,6 @@ export default function AuthPage() {
         className="w-24 h-24 mb-4 rounded-full shadow-lg border-4 border-white"
       />
 
-      {/* App Name */}
       <motion.h1
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -75,7 +80,6 @@ export default function AuthPage() {
         WeConnect
       </motion.h1>
 
-      {/* Form */}
       <motion.form
         onSubmit={handleSubmit}
         initial={{ opacity: 0, scale: 0.95 }}
