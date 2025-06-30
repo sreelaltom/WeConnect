@@ -37,7 +37,7 @@ export default function AuthPage() {
 
       if (isLogin && (status === 401 || detail?.includes("not found"))) {
         setError(
-          "User not found or wrong password. Redirecting to Register..."
+          "User not found or wrong password.Sign up to create an account."
         );
         setTimeout(() => {
           setIsLogin(false); // switch to register form
