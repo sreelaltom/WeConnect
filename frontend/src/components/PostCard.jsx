@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { likePost, unlikePost } from "../api/post";
 import { getComments, addComment } from "../api/comments";
-import { Heart, MessageCircle, AlertCircle, Send } from "lucide-react";
+import { FaHeart, FaRegHeart, FaComment } from "react-icons/fa";
+import { AlertCircle, Send } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
 export default function PostCard({ post }) {
@@ -162,39 +163,27 @@ export default function PostCard({ post }) {
         </div>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex justify-between items-center pt-2">
+      {/* Action Buttons - Profile.jsx Style */}
+      <div className="flex items-center space-x-4 mt-4">
         <button
           onClick={toggleLike}
           disabled={isLikeLoading}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-            isLikeLoading ? "opacity-50 cursor-wait" : ""
-          } ${
-            liked
-              ? isDarkMode
-                ? "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
-                : "bg-red-500 text-white hover:bg-red-600 focus:ring-red-400"
-              : isDarkMode
-              ? "bg-gray-700 text-gray-300 hover:bg-red-600 hover:text-white focus:ring-gray-500"
-              : "bg-gray-100 text-gray-700 hover:bg-red-500 hover:text-white focus:ring-gray-300"
+          className={`flex items-center space-x-1 transition-colors ${
+            isLikeLoading
+              ? "opacity-50 cursor-wait"
+              : "text-green-500 hover:text-green-600"
           }`}
         >
-          <Heart size={16} fill={liked ? "currentColor" : "none"} />
-          <span>
-            {liked ? "Liked" : "Like"} ({likeCount || 0})
-          </span>
+          {liked ? <FaHeart /> : <FaRegHeart />}
+          <span>{likeCount || 0}</span>
         </button>
 
         <button
           onClick={toggleComments}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-            isDarkMode
-              ? "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
-              : "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-400"
-          }`}
+          className="flex items-center space-x-1 text-blue-500 hover:text-blue-600 transition-colors"
         >
-          <MessageCircle size={16} />
-          <span>{showComments ? "Hide" : "Comments"}</span>
+          <FaComment />
+          <span>{comments.length}</span>
         </button>
       </div>
 
