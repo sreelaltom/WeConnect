@@ -6,7 +6,7 @@ import { useTheme } from "../context/ThemeContext";
 
 export default function PostCard({ post }) {
   const { theme } = useTheme();
-  const isDarkMode = theme === "light";
+  const isDarkMode = theme === "dark";
 
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes_count || 0);
@@ -79,7 +79,7 @@ export default function PostCard({ post }) {
   };
 
   const handleAddComment = async (e) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
 
     if (!newComment.trim() || !post.id || isCommentLoading) return;
 
@@ -97,7 +97,6 @@ export default function PostCard({ post }) {
     }
   };
 
-  // Handle Enter key press for desktop
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -107,129 +106,189 @@ export default function PostCard({ post }) {
 
   return (
     <div
-      className={`shadow-md rounded-xl p-4 space-y-3 border transition-colors duration-500 ${
+      className={`shadow-lg rounded-xl p-6 space-y-4 border transition-all duration-300 hover:shadow-xl ${
         isDarkMode
-          ? "bg-gray-900 text-white border-gray-700"
-          : "bg-white text-black border-gray-300"
+          ? "bg-gray-800 text-white border-gray-700"
+          : "bg-white text-gray-900 border-gray-200"
       }`}
     >
+      {/* Header */}
       <div className="flex justify-between items-start">
-        <span className="font-semibold text-sm sm:text-base">
+        <span
+          className={`font-semibold text-sm sm:text-base ${
+            isDarkMode ? "text-blue-400" : "text-blue-600"
+          }`}
+        >
           @{post.owner_username}
         </span>
-        <span className="text-xs sm:text-sm text-gray-500">
+        <span
+          className={`text-xs sm:text-sm ${
+            isDarkMode ? "text-gray-400" : "text-gray-500"
+          }`}
+        >
           {new Date(post.timestamp).toLocaleString()}
         </span>
       </div>
 
-      <h2 className="text-base sm:text-lg font-bold leading-tight">
-        {post.title}
-      </h2>
-      <p className="text-sm sm:text-base leading-relaxed">{post.content}</p>
-
-      <div className="flex flex-col space-y-2">
-        {likeError && (
-          <div className="flex items-center text-xs text-red-500 bg-red-100 dark:bg-red-900 dark:text-red-200 p-2 rounded">
-            <AlertCircle size={14} className="mr-1 flex-shrink-0" />
-            <span>{likeError}</span>
-          </div>
-        )}
-
-        <div className="flex justify-between items-center gap-2">
-          <button
-            onClick={toggleLike}
-            disabled={isLikeLoading}
-            className={`flex items-center space-x-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium transition transform touch-manipulation ${
-              isLikeLoading ? "opacity-50 cursor-wait" : ""
-            } ${
-              liked
-                ? "bg-red-500 text-white scale-105"
-                : isDarkMode
-                ? "bg-gray-200 text-black hover:bg-red-400 hover:text-white active:bg-red-500"
-                : "bg-gray-700 text-white hover:bg-red-400 hover:text-white active:bg-red-500"
-            }`}
-          >
-            <Heart size={14} fill={liked ? "white" : "none"} />
-            <span>
-              {liked ? "Liked" : "Like"} ({likeCount || 0})
-            </span>
-          </button>
-
-          <button
-            onClick={toggleComments}
-            className="flex items-center space-x-1 px-2 sm:px-3 py-1 bg-blue-500 text-white rounded-full text-xs sm:text-sm hover:bg-blue-600 active:bg-blue-700 transition transform hover:scale-105 touch-manipulation"
-          >
-            <MessageCircle size={14} />
-            <span>{showComments ? "Hide" : "Comments"}</span>
-          </button>
-        </div>
+      {/* Content */}
+      <div className="space-y-3">
+        <h2
+          className={`text-base sm:text-lg font-bold leading-tight ${
+            isDarkMode ? "text-white" : "text-gray-900"
+          }`}
+        >
+          {post.title}
+        </h2>
+        <p
+          className={`text-sm sm:text-base leading-relaxed ${
+            isDarkMode ? "text-gray-300" : "text-gray-700"
+          }`}
+        >
+          {post.content}
+        </p>
       </div>
 
+      {/* Error Message */}
+      {likeError && (
+        <div
+          className={`flex items-center text-xs p-3 rounded-lg ${
+            isDarkMode
+              ? "bg-red-900/50 text-red-300 border border-red-700"
+              : "bg-red-50 text-red-600 border border-red-200"
+          }`}
+        >
+          <AlertCircle size={16} className="mr-2 flex-shrink-0" />
+          <span>{likeError}</span>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex justify-between items-center pt-2">
+        <button
+          onClick={toggleLike}
+          disabled={isLikeLoading}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            isLikeLoading ? "opacity-50 cursor-wait" : ""
+          } ${
+            liked
+              ? isDarkMode
+                ? "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500"
+                : "bg-red-500 text-white hover:bg-red-600 focus:ring-red-400"
+              : isDarkMode
+              ? "bg-gray-700 text-gray-300 hover:bg-red-600 hover:text-white focus:ring-gray-500"
+              : "bg-gray-100 text-gray-700 hover:bg-red-500 hover:text-white focus:ring-gray-300"
+          }`}
+        >
+          <Heart size={16} fill={liked ? "currentColor" : "none"} />
+          <span>
+            {liked ? "Liked" : "Like"} ({likeCount || 0})
+          </span>
+        </button>
+
+        <button
+          onClick={toggleComments}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            isDarkMode
+              ? "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500"
+              : "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-400"
+          }`}
+        >
+          <MessageCircle size={16} />
+          <span>{showComments ? "Hide" : "Comments"}</span>
+        </button>
+      </div>
+
+      {/* Comments Section */}
       {showComments && (
-        <div className="mt-4 space-y-3">
+        <div
+          className={`mt-6 space-y-4 pt-4 border-t ${
+            isDarkMode ? "border-gray-700" : "border-gray-200"
+          }`}
+        >
           {comments.length > 0 ? (
-            <div className="space-y-2 max-h-60 overflow-y-auto">
+            <div className="space-y-3 max-h-80 overflow-y-auto">
               {comments.map((comment) => (
                 <div
                   key={comment.id}
-                  className={`border p-2 sm:p-3 rounded text-sm ${
+                  className={`p-4 rounded-lg border transition-colors ${
                     isDarkMode
-                      ? "bg-gray-800 text-white border-gray-700"
-                      : "bg-gray-100 text-black border-gray-300"
+                      ? "bg-gray-700 border-gray-600 text-gray-100"
+                      : "bg-gray-50 border-gray-200 text-gray-800"
                   }`}
                 >
-                  <span className="font-semibold">
-                    @{comment.owner_username}:
-                  </span>{" "}
-                  <span className="break-words">{comment.content}</span>
+                  <div className="flex items-start space-x-2">
+                    <span
+                      className={`font-semibold text-sm ${
+                        isDarkMode ? "text-blue-400" : "text-blue-600"
+                      }`}
+                    >
+                      @{comment.owner_username}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm leading-relaxed break-words">
+                    {comment.content}
+                  </p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No comments yet.</p>
+            <p
+              className={`text-sm text-center py-4 ${
+                isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              No comments yet. Be the first to comment!
+            </p>
           )}
 
-          {/* Mobile-optimized comment form */}
-          <form
-            onSubmit={handleAddComment}
-            className="flex flex-col sm:flex-row gap-2 mt-3"
-          >
-            <div className="flex-1">
+          {/* Comment Form */}
+          <form onSubmit={handleAddComment} className="space-y-3">
+            <div className="relative">
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Add a comment..."
-                rows="2"
-                className={`w-full border rounded-lg px-3 py-2 text-sm transition resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                placeholder="Share your thoughts..."
+                rows="3"
+                className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 resize-none focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   isDarkMode
-                    ? "bg-gray-800 text-white border-gray-700 placeholder-gray-400"
-                    : "bg-gray-100 text-black border-gray-300 placeholder-gray-500"
+                    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500"
+                    : "bg-white text-gray-900 border-gray-300 placeholder-gray-500 focus:ring-blue-400 focus:border-blue-400"
                 }`}
                 style={{
                   WebkitAppearance: "none",
-                  fontSize: "16px", // Prevents zoom on iOS
+                  fontSize: "16px",
                 }}
               />
             </div>
-            <button
-              type="submit"
-              disabled={!newComment.trim() || isCommentLoading}
-              className={`flex items-center justify-center gap-1 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition touch-manipulation min-w-[80px] ${
-                !newComment.trim() || isCommentLoading
-                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                  : "bg-green-500 text-white hover:bg-green-600 active:bg-green-700"
-              }`}
-            >
-              {isCommentLoading ? (
-                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-              ) : (
-                <>
-                  <Send size={14} />
-                  <span className="hidden sm:inline">Post</span>
-                </>
-              )}
-            </button>
+
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={!newComment.trim() || isCommentLoading}
+                className={`flex items-center space-x-2 px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 transform focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  !newComment.trim() || isCommentLoading
+                    ? isDarkMode
+                      ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : isDarkMode
+                    ? "bg-green-600 text-white hover:bg-green-700 hover:scale-105 focus:ring-green-500"
+                    : "bg-green-500 text-white hover:bg-green-600 hover:scale-105 focus:ring-green-400"
+                }`}
+              >
+                {isCommentLoading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    <span>Posting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send size={16} />
+                    <span>Post Comment</span>
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         </div>
       )}
